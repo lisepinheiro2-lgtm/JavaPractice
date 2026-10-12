@@ -86,4 +86,16 @@ public class CSV {
 
 		}
 	}
+
+	public static void saveReport(String filePath, ArrayList<String> records) throws IOException {
+
+		try (FileWriter writer = new FileWriter(filePath)) {
+
+			for (String record : records) {
+
+						writer.write(record + System.lineSeparator());
+			}
+
+		}
+	}
 }

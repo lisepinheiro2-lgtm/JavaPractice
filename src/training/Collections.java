@@ -1,8 +1,9 @@
 package training;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
 public class Collections {
@@ -310,5 +311,66 @@ public class Collections {
 		return totalDuration;
 	}
 
+	public static void sortInterventions(ArrayList<String> records) {
 
+		records.sort((record1, record2) -> {
+
+			String[] parts1 = record1.split(";");
+			String[] parts2 = record2.split(";");
+
+			String employee1 = parts1[0];
+			LocalTime startHour1 = LocalTime.parse(parts1[1]);
+			LocalTime endHour1 = LocalTime.parse(parts1[2]);
+
+			String employee2 = parts2[0];
+			LocalTime startHour2 = LocalTime.parse(parts2[1]);
+			LocalTime endHour2 = LocalTime.parse(parts2[2]);
+
+			long totalDuration1 = Duration.between(startHour1, endHour1).toMinutes();
+			long totalDuration2 = Duration.between(startHour2, endHour2).toMinutes();
+
+			int comparison = Long.compare(totalDuration2, totalDuration1);
+
+			if (comparison != 0) {
+				return comparison;
+			}
+
+			return employee1.compareTo(employee2);
+		});
+
+	}
+
+	public static ArrayList<String> findInvalidRecords(ArrayList<String> records) {
+
+		ArrayList<String> invalidRecords = new ArrayList<String>();
+
+		for (String record : records) {
+
+			boolean isValid = false;
+			String[] parts = record.split(";");
+
+			try {
+
+				String name = parts[0];
+				LocalTime startHour = LocalTime.parse(parts[1]);
+				LocalTime endHour = LocalTime.parse(parts[2]);
+				
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+				boolean validFormat = startHour.format(formatter).equals(parts[1]);
+				boolean validFormat2 = endHour.format(formatter).equals(parts[2]);
+
+				if (!name.isBlank() && startHour.isBefore(endHour) && validFormat && validFormat2) {
+					isValid = true;
+				}
+
+			} catch (DateTimeParseException e) {
+			}
+
+			if (!isValid) {
+				invalidRecords.add(record);
+			}
+		}
+
+		return invalidRecords;
+	}
 }

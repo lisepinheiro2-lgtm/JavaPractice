@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.TreeSet;
@@ -290,5 +291,74 @@ public class Dates {
 		}
 
 		return findNeighborDates;
+	}
+
+	public static boolean isOldIntervention(String interventionText, String referenceText, int limitDays) {
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/uuuu");
+		LocalDate interventionDate = LocalDate.parse(interventionText, formatter);
+		LocalDate referenceDate = LocalDate.parse(referenceText, formatter);
+
+		long days = ChronoUnit.DAYS.between(interventionDate, referenceDate);
+
+		return days >= limitDays && days >= 0;
+	}
+
+	public static LocalDate findNextAppointment(ArrayList<LocalDate> appointments, LocalDate today) {
+
+		TreeSet<LocalDate> appointementsOrganized = new TreeSet<LocalDate>();
+		appointementsOrganized.addAll(appointments);
+
+		return appointementsOrganized.higher(today);
+	}
+
+	public static ArrayList<LocalDate> findNextTwoAppointments(ArrayList<LocalDate> appointments, LocalDate today) {
+
+		TreeSet<LocalDate> appointementsOrganized = new TreeSet<LocalDate>();
+		ArrayList<LocalDate> nextTwoAppointements = new ArrayList<LocalDate>();
+
+		appointementsOrganized.addAll(appointments);
+
+		LocalDate nextDate1 = appointementsOrganized.higher(today);
+
+		if (nextDate1 != null) {
+			LocalDate nextDate2 = appointementsOrganized.higher(nextDate1);
+
+			nextTwoAppointements.add(nextDate1);
+
+			if (nextDate2 != null) {
+
+				nextTwoAppointements.add(nextDate2);
+			}
+		}
+
+		return nextTwoAppointements;
+	}
+
+	public static int countOverlappingInterventions(ArrayList<LocalTime[]> interventions) {
+
+		int count = 0;
+
+		for (int i = 0; i < interventions.size(); i++) {
+
+			LocalTime currentStartHour = interventions.get(i)[0];
+			LocalTime currentEndHour = interventions.get(i)[1];
+
+			int j = interventions.size() - 1;
+
+			while (j > i) {
+
+				LocalTime nextsStartHours = interventions.get(j)[0];
+				LocalTime nextsEndHours = interventions.get(j)[1];
+
+				if (nextsStartHours.isBefore(currentEndHour) && nextsEndHours.isAfter(currentStartHour)) {
+					count++;
+				}
+
+				j--;
+			}
+		}
+
+		return count;
 	}
 }

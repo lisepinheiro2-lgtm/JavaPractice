@@ -1,7 +1,9 @@
 package training;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 
 import javax.swing.JButton;
@@ -28,13 +30,20 @@ public class Swing {
 	private JPanel panelNorth;
 	private JPanel difficultyPanel;
 	private JTextField pseudoField;
+	private JPanel homePanel;
+	private JPanel homePanelIntervention;
+	private JPanel homeButtonPanel;
+	private JButton accueilHomeButton;
+	private JButton interventionHomeButton;
+	private JPanel cardsPanel;
+	private CardLayout cardLayout;
 
 	String[] pseudos = { "Charlotte", "Anna", };
 
 	public void createPanel() {
 
 		panel = new JPanel();
-		panel.setLayout(new GridLayout(3, 1));
+		panel.setLayout(new GridLayout(4, 1));
 		panel.setForeground(Color.DARK_GRAY);
 
 		practiceLabel = new JLabel("Java Practice");
@@ -45,6 +54,9 @@ public class Swing {
 
 		startButton = new JButton("Start");
 		resetButton = new JButton("Reset");
+
+		JLabel homeLabel = new JLabel("<html><center>Accueil<br>Bienvenue dans JavaPractice</center></html>");
+		homeLabel.setHorizontalAlignment(JLabel.CENTER);
 
 		JPanel startReset = new JPanel();
 		startReset.setLayout(new GridLayout(1, 0));
@@ -57,6 +69,7 @@ public class Swing {
 		panel.add(startReset);
 		startReset.add(startButton);
 		startReset.add(resetButton);
+		panel.add(homeLabel);
 	}
 
 	public JPanel createPanelNorth() {
@@ -213,6 +226,55 @@ public class Swing {
 		return selectMod;
 	}
 
+	public JPanel createHomePanel() {
+
+		homePanel = new JPanel();
+
+		homePanel.setLayout(new BorderLayout());
+
+		homePanel.add(createPanelNorth(), BorderLayout.NORTH);
+		homePanel.add(panelButton, BorderLayout.CENTER);
+		homePanel.add(panel, BorderLayout.SOUTH);
+
+		return homePanel;
+	}
+
+	public void createCardsPanel() {
+
+		cardLayout = new CardLayout();
+		cardsPanel = new JPanel(cardLayout);
+
+		cardsPanel.add(createHomePanel(), "HOME");
+		cardsPanel.add(createHomePanelIntervention(), "INTERVENTIONS");
+	}
+
+	public JPanel createHomePanelIntervention() {
+
+		homePanelIntervention = new JPanel();
+		JLabel interventionLabel = new JLabel("<html><center>Interventions<br>Liste des interventions</center></html>");
+
+		homePanelIntervention.add(interventionLabel);
+
+		return homePanelIntervention;
+	}
+
+	public JPanel createHomeButtonPanel() {
+
+		homeButtonPanel = new JPanel();
+		accueilHomeButton = new JButton("Accueil");
+		interventionHomeButton = new JButton("Interventions");
+
+		homeButtonPanel.setLayout(new GridLayout(1, 2, 8, 0));
+
+		homeButtonPanel.add(accueilHomeButton, BorderLayout.WEST);
+		homeButtonPanel.add(interventionHomeButton, BorderLayout.EAST);
+
+		accueilHomeButton.addActionListener(e -> cardLayout.show(cardsPanel, "HOME"));
+		interventionHomeButton.addActionListener(e -> cardLayout.show(cardsPanel, "INTERVENTIONS"));
+
+		return homeButtonPanel;
+	}
+
 	public void createButtonPanel() {
 
 		panelButton = new JPanel();
@@ -232,11 +294,12 @@ public class Swing {
 	public void createFrame() {
 
 		frame = new JFrame();
-		frame.setLayout(new GridLayout(3, 0));
+		frame.setLayout(new BorderLayout());
 
-		frame.add(createPanelNorth());
-		frame.add(panelButton);
-		frame.add(panel);
+		createCardsPanel();
+
+		frame.add(cardsPanel, BorderLayout.CENTER);
+		frame.add(createHomeButtonPanel(), BorderLayout.SOUTH);
 
 		frame.setSize(300, 320);
 		frame.setLocationRelativeTo(null);
