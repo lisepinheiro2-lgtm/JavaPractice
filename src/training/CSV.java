@@ -93,9 +93,49 @@ public class CSV {
 
 			for (String record : records) {
 
-						writer.write(record + System.lineSeparator());
+				writer.write(record + System.lineSeparator());
 			}
 
+		}
+	}
+
+	public void updateIntervention(String filePath, String firstName, String newEndHour) throws IOException {
+
+		File file = new File(filePath);
+
+		if (!file.exists()) {
+			return;
+		}
+
+		String employeeName = null;
+		String startHour = null;
+		String line;
+		ArrayList<String> newEndHours = new ArrayList<String>();
+
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+
+			while ((line = reader.readLine()) != null) {
+
+				newEndHours.add(line);
+			}
+		}
+
+		try (FileWriter writer = new FileWriter(filePath)) {
+
+			for (String intervention : newEndHours) {
+
+				String[] data = intervention.split(";");
+				employeeName = data[0];
+				startHour = data[1];
+
+				if (data.length == 3 && employeeName.equalsIgnoreCase(firstName)) {
+
+					String updatedLine = employeeName + ";" + startHour + ";" + newEndHour;
+					writer.write(updatedLine + System.lineSeparator());
+				} else {
+					writer.write(intervention + System.lineSeparator());
+				}
+			}
 		}
 	}
 }

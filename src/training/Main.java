@@ -46,6 +46,9 @@ public class Main {
 
 		System.out.println(Collections.findBestReplacement(replacements, 5));
 
+		int[][] absences = { { 1, 3 }, { 5, 8 }, { 3, 5 }, { 12, 14 } };
+		
+		System.out.println(Basics.isAbsenceCovered(absences, 12, 14));
 	}
 
 }
