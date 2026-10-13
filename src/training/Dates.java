@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
@@ -361,4 +362,95 @@ public class Dates {
 
 		return count;
 	}
+
+	public static ArrayList<LocalDate> findBusyDays(ArrayList<LocalDate> appointments, int minimum) {
+
+		ArrayList<LocalDate> busyDays = new ArrayList<LocalDate>();
+
+		for (int i = 0; i < appointments.size(); i++) {
+
+			int count = 1;
+			int j = appointments.size() - 1;
+			LocalDate currentDate = appointments.get(i);
+
+			while (j > i) {
+				LocalDate otherDates = appointments.get(j);
+
+				if (currentDate.equals(otherDates)) {
+					count++;
+				}
+				j--;
+			}
+
+			boolean add = true;
+
+			for (LocalDate busyDay : busyDays) {
+				if (currentDate.equals(busyDay)) {
+					add = false;
+					break;
+				}
+			}
+
+			if (add && count >= minimum) {
+				busyDays.add(currentDate);
+			}
+		}
+
+		busyDays.sort(null);
+		return busyDays;
+	}
+
+	public static ArrayList<LocalDate> findFreeDays(ArrayList<LocalDate> appointments, LocalDate startDate,
+			LocalDate endDate) {
+
+		TreeSet<LocalDate> organisedAppointments = new TreeSet<LocalDate>();
+		organisedAppointments.addAll(appointments);
+
+		ArrayList<LocalDate> freeDays = new ArrayList<LocalDate>();
+
+		LocalDate testedDate = startDate;
+
+		while (testedDate.isBefore(endDate) || testedDate.equals(endDate)) {
+
+			boolean hasSeen = false;
+
+			for (LocalDate date : organisedAppointments) {
+
+				if (testedDate.equals(date)) {
+					hasSeen = true;
+					break;
+				}
+			}
+
+			if (!hasSeen) {
+				freeDays.add(testedDate);
+
+			}
+
+			testedDate = testedDate.plusDays(1);
+		}
+
+		return freeDays;
+	}
+
+	public static int findLongestIntervention(ArrayList<LocalTime[]> interventions) {
+
+		long maxWorkTime = 0;
+
+		for (LocalTime[] intervention : interventions) {
+
+			long workTime = 0;
+			LocalTime startTime = intervention[0];
+			LocalTime endTime = intervention[1];
+
+			workTime = Duration.between(startTime, endTime).toMinutes();
+
+			if (workTime > maxWorkTime) {
+				maxWorkTime = workTime;
+			}
+		}
+
+		return (int) maxWorkTime;
+	}
+
 }

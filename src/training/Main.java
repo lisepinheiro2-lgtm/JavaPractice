@@ -36,6 +36,16 @@ public class Main {
 			System.out.println(
 					intervention.getFirstName() + " " + intervention.getStartHour() + " " + intervention.getEndHour());
 		}
+
+		ArrayList<String[]> replacements = new ArrayList<>();
+
+		replacements.add(new String[] { "Alice", "12", "8" });
+		replacements.add(new String[] { "Lucas", "6", "2" });
+		replacements.add(new String[] { "Emma", "10", "5" });
+		replacements.add(new String[] { "Hugo", "4", "1" });
+
+		System.out.println(Collections.findBestReplacement(replacements, 5));
+
 	}
 
 }

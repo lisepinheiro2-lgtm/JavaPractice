@@ -1,5 +1,6 @@
 package training;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -354,7 +355,7 @@ public class Collections {
 				String name = parts[0];
 				LocalTime startHour = LocalTime.parse(parts[1]);
 				LocalTime endHour = LocalTime.parse(parts[2]);
-				
+
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 				boolean validFormat = startHour.format(formatter).equals(parts[1]);
 				boolean validFormat2 = endHour.format(formatter).equals(parts[2]);
@@ -372,5 +373,36 @@ public class Collections {
 		}
 
 		return invalidRecords;
+	}
+
+	public static String findBestReplacement(ArrayList<String[]> replacements, int requiredHours) {
+
+		int maxNoAttribuateHours = 0;
+		String replacentName = null;
+
+		for (String[] replacment : replacements) {
+
+			int totalHours = Integer.parseInt(replacment[1]);
+			int workingHours = Integer.parseInt(replacment[2]);
+			String currentName = replacment[0];
+			int noAttribuateHours = totalHours - workingHours;
+
+			if (replacentName == null && noAttribuateHours >= requiredHours
+					|| noAttribuateHours >= requiredHours && noAttribuateHours > maxNoAttribuateHours) {
+
+				maxNoAttribuateHours = noAttribuateHours;
+				replacentName = replacment[0];
+				
+			} else if (noAttribuateHours >= requiredHours && maxNoAttribuateHours == noAttribuateHours) {
+
+				int result = replacentName.compareTo(currentName);
+
+				if (result > 0) {
+					replacentName = currentName;
+				}
+			}
+		}
+
+		return replacentName;
 	}
 }
