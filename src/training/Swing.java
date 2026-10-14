@@ -13,6 +13,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 public class Swing {
 
@@ -37,6 +39,7 @@ public class Swing {
 	private JButton interventionHomeButton;
 	private JPanel cardsPanel;
 	private CardLayout cardLayout;
+	private JButton searchButton;
 
 	String[] pseudos = { "Charlotte", "Anna", };
 
@@ -87,9 +90,9 @@ public class Swing {
 
 	public void search(String[] pseudos) {
 
-		String pseudoName = pseudoField.getText();
-
 		for (String pseudo : pseudos) {
+
+			String pseudoName = pseudoField.getText();
 
 			if (pseudoName.trim().equalsIgnoreCase(pseudo)) {
 				JOptionPane.showMessageDialog(frame, "Recherche de " + pseudo);
@@ -194,17 +197,52 @@ public class Swing {
 
 		JLabel pseudoLabel = new JLabel("Pseudo : ");
 
-		pseudoField = new JTextField();
+		searchButton = new JButton("Search");
 
-		JButton searchButton = new JButton("Search");
 		searchButton.addActionListener(e -> search(pseudos));
 
 		searchPanel.add(pseudoLabel, BorderLayout.WEST);
-		searchPanel.add(pseudoField, BorderLayout.CENTER);
+		searchPanel.add(createPseudoField(), BorderLayout.CENTER);
 		searchPanel.add(searchButton, BorderLayout.EAST);
 
 		return searchPanel;
 
+	}
+
+	private JTextField createPseudoField() {
+
+		DocumentListener listener = new DocumentListener() {
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				updateSearchButton();
+
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				updateSearchButton();
+
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				updateSearchButton();
+
+			}
+		};
+
+		pseudoField = new JTextField();
+		searchButton.setEnabled(false);
+		pseudoField.getDocument().addDocumentListener(listener);
+		return pseudoField;
+	}
+
+	private void updateSearchButton() {
+
+		boolean empty = pseudoField.getText().isBlank();
+
+		searchButton.setEnabled(!empty);
 	}
 
 	public JPanel selectMod() {

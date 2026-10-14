@@ -1,7 +1,5 @@
 package training;
 
-import java.util.Comparator;
-
 public class Basics {
 
 	public static int limitScore(int score) {
@@ -42,5 +40,10 @@ public class Basics {
 		}
 
 		return true;
+	}
+
+	public static int limitScore1(int score) {
+
+		return Math.max(0, Math.min(score, 100));
 	}
 }

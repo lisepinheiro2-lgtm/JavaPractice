@@ -49,6 +49,16 @@ public class Main {
 		int[][] absences = { { 1, 3 }, { 5, 8 }, { 3, 5 }, { 12, 14 } };
 		
 		System.out.println(Basics.isAbsenceCovered(absences, 12, 14));
+		
+		ArrayList<String[]> employees = new ArrayList<>();
+
+		employees.add(new String[] {"Alice", "8", "3"});
+		employees.add(new String[] {"Lucas", "6", "2"});
+		employees.add(new String[] {"Emma", "10", "7"});
+
+		int[] interventions = {4, 3, 2, 5};
+		
+		System.out.println(Collections.assignInterventions(employees, interventions));
 	}
 
 }

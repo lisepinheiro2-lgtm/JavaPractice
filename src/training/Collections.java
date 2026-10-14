@@ -1,5 +1,6 @@
 package training;
 
+import java.lang.classfile.instruction.NewMultiArrayInstruction;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -391,7 +392,7 @@ public class Collections {
 
 				maxNoAttribuateHours = noAttribuateHours;
 				replacentName = replacment[0];
-				
+
 			} else if (noAttribuateHours >= requiredHours && maxNoAttribuateHours == noAttribuateHours) {
 
 				int result = replacentName.compareTo(currentName);
@@ -403,5 +404,80 @@ public class Collections {
 		}
 
 		return replacentName;
+	}
+
+	public static int findFirstAvailable(int[][] interventions, int[][] availabilities) {
+
+		int index = -1;
+
+		for (int i = 0; i < interventions.length; i++) {
+
+			for (int[] availability : availabilities) {
+
+				if (availability[0] <= interventions[i][0] && availability[1] >= interventions[i][1]) {
+					return index = i;
+				}
+			}
+		}
+
+		return index;
+	}
+
+	public static void reorganizePriorities(ArrayList<String[]> tasks) {
+
+		tasks.sort((task1, task2) -> {
+
+			String name1 = task1[0];
+			int priority1 = Integer.parseInt(task1[1]);
+			int duration1 = Integer.parseInt(task1[2]);
+
+			String name2 = task2[0];
+			int priority2 = Integer.parseInt(task2[1]);
+			int duration2 = Integer.parseInt(task2[2]);
+
+			int comparison = Integer.compare(priority1, priority2);
+
+			if (comparison != 0) {
+				return comparison;
+			}
+
+			int finalComparison = Integer.compare(duration2, duration1);
+
+			if (finalComparison != 0) {
+				return finalComparison;
+			}
+
+			return name1.compareTo(name2);
+		});
+	}
+
+	public static ArrayList<String> assignInterventions(ArrayList<String[]> employees, int[] interventions) {
+
+		ArrayList<String> interventionsAssignedAt = new ArrayList<String>();
+
+		for (int intervention : interventions) {
+
+			String name = "Non attribuée";
+			boolean attribuate = false;
+
+			for (String[] employee : employees) {
+
+				int inatribuateHours = Integer.parseInt(employee[1]);
+
+				if (!attribuate && inatribuateHours >= intervention) {
+					name = employee[0];
+					attribuate = true;
+					interventionsAssignedAt.add(name);
+					employee[1] = String.valueOf(inatribuateHours -= intervention);
+					break;
+				}
+			}
+
+			if (!attribuate) {
+				interventionsAssignedAt.add(name);
+			}
+		}
+
+		return interventionsAssignedAt;
 	}
 }
