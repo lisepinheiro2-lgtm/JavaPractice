@@ -46,4 +46,39 @@ public class Basics {
 
 		return Math.max(0, Math.min(score, 100));
 	}
+
+	public static int findFirstStockAnomaly(int[] movements, int initialStock) {
+
+		for (int i = 0; i < movements.length; i++) {
+
+			initialStock += movements[i];
+
+			if (initialStock < 0) {
+				return i;
+			}
+		}
+
+		return -1;
+	}
+
+	public static int findCriticalSequence(int[] results) {
+
+		int index = -1;
+
+		for (int i = 0; i < results.length - 2; i++) {
+
+			if (results[i] == 0) {
+
+				continue;
+
+			} else if ((results[i + 1] > 0 && results[i + 2] > 0)
+					&& (results[i] == 2 || results[i + 1] == 2 || results[i + 2] == 2)) {
+
+				index = i;
+				break;
+			}
+		}
+
+		return index;
+	}
 }

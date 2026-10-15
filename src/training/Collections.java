@@ -480,4 +480,102 @@ public class Collections {
 
 		return interventionsAssignedAt;
 	}
+
+	public static String findBestSlot(ArrayList<int[]> slots, int requiredMinutes) {
+
+		String bestSlotID = null;
+		int minGap = -1;
+		int bestDistance = -1;
+
+		for (int[] slot : slots) {
+
+			int id = slot[0];
+			int duration = slot[1];
+			int distance = slot[2];
+			int gap = duration - requiredMinutes;
+
+			if (gap < 0) {
+				continue;
+			}
+
+			if (minGap == -1 || gap < minGap || gap == minGap && distance < bestDistance) {
+				bestSlotID = String.valueOf(id);
+				minGap = gap;
+				bestDistance = distance;
+			}
+		}
+
+		return bestSlotID;
+	}
+
+	public static int transferHours(ArrayList<String> employees, ArrayList<Integer> assignedHours, String fromEmployee,
+			String toEmployee, int hours) {
+
+		boolean fromEmployeeFound = false;
+		boolean toEmployeeFound = false;
+		int indexFrom = -1;
+		int indexTo = -1;
+
+		if (hours <= 0 || fromEmployee.equalsIgnoreCase(toEmployee)) {
+			return -1;
+		}
+
+		for (int i = 0; i < employees.size(); i++) {
+
+			if (employees.get(i).equalsIgnoreCase(fromEmployee)) {
+
+				if (assignedHours.get(i) - hours < 0) {
+					return -1;
+
+				} else {
+					fromEmployeeFound = true;
+					indexFrom = i;
+				}
+			}
+
+			if (employees.get(i).equalsIgnoreCase(toEmployee)) {
+				toEmployeeFound = true;
+				indexTo = i;
+			}
+		}
+
+		if (toEmployeeFound && fromEmployeeFound) {
+
+			assignedHours.set(indexFrom, assignedHours.get(indexFrom) - hours);
+			assignedHours.set(indexTo, assignedHours.get(indexTo) + hours);
+			///test		
+			// System.out.println(employees.get(indexFrom) + " : " +
+			// assignedHours.get(indexFrom) + " --> "
+			// + employees.get(indexTo) + " : " + assignedHours.get(indexTo));
+			return 1;
+		}
+		return -1;
+	}
+
+	public static boolean canScheduleIntervention(ArrayList<LocalTime[]> interventions, LocalTime newStart,
+			LocalTime newEnd) {
+
+		if (newEnd.isBefore(newStart) || newEnd.equals(newStart)) {
+			return false;
+		}
+
+		if (interventions.isEmpty()) {
+			return true;
+		}
+
+		for (LocalTime[] intervention : interventions) {
+
+			LocalTime startHour = intervention[0];
+			LocalTime endHour = intervention[1];
+
+			boolean result = startHour.isAfter(newEnd) || startHour.equals(newEnd) || endHour.isBefore(newStart)
+					|| endHour.equals(newStart);
+
+			if (!result) {
+				return false;
+			}
+		}
+
+		return true;
+	}
 }

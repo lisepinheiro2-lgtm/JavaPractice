@@ -16,7 +16,7 @@ public class CSV {
 	public CSV(ArrayList<Intervention> interventions) {
 
 		this.interventions = interventions;
-
+		
 		loadInterventions();
 	}
 
@@ -137,5 +137,26 @@ public class CSV {
 				}
 			}
 		}
+	}
+
+	public int updateEndHours(ArrayList<String> records, String targetName, String newEndHour) throws IOException {
+
+		int count = 0;
+
+		for (int i = 0; i < records.size(); i++) {
+
+			String[] parts = records.get(i).split(";");
+			String name = parts[0];
+
+			if (name.equalsIgnoreCase(targetName)) {
+				records.set(i, name + ";" + parts[1] + ";" + newEndHour);
+				count++;
+			}
+		}
+
+		if (count > 0) {
+			saveReport(fileName, records);
+		}
+		return count;
 	}
 }
