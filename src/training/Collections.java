@@ -1,7 +1,10 @@
 package training;
 
+import java.io.IOException;
 import java.lang.classfile.instruction.NewMultiArrayInstruction;
+import java.text.ParseException;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -573,6 +576,78 @@ public class Collections {
 
 			if (!result) {
 				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public static int removeCancelledBookings(ArrayList<String> bookings) {
+
+		int countBefore = bookings.size();
+
+		bookings.removeIf(booking -> booking.split(";")[1].equalsIgnoreCase("canceled"));
+
+		int countAfter = bookings.size();
+
+		return countBefore - countAfter;
+	}
+
+	public static boolean canMoveIntervention(ArrayList<String[]> interventions, String employee, String oldDate,
+			String newDate) {
+
+		if (oldDate.equals(newDate)) {
+			return false;
+		}
+
+		ArrayList<String[]> interventionsAtOldDate = new ArrayList<String[]>();
+
+		for (String[] intervention : interventions) {
+
+			if (intervention.length == 4) {
+
+				String name = intervention[0];
+				String dateText = intervention[1];
+
+				if (name.equalsIgnoreCase(employee) && dateText.equals(oldDate)) {
+					interventionsAtOldDate.add(intervention);
+				}
+			}
+		}
+
+		if (interventionsAtOldDate.isEmpty()) {
+			return false;
+		}
+
+		for (String[] intervention : interventions) {
+
+			String name = intervention[0];
+			String dateText = intervention[1];
+			String startHourText = intervention[2];
+			String endHourText = intervention[3];
+
+			if (name.equalsIgnoreCase(employee) && dateText.equals(newDate)) {
+
+				for (String[] oldIntervention : interventionsAtOldDate) {
+
+					String oldStartHourText = oldIntervention[2];
+					String oldEndHourText = oldIntervention[3];
+
+					try {
+
+						LocalTime startHour = LocalTime.parse(startHourText);
+						LocalTime endHour = LocalTime.parse(endHourText);
+						LocalTime oldEndHour = LocalTime.parse(oldEndHourText);
+						LocalTime oldStartHour = LocalTime.parse(oldStartHourText);
+
+						if (startHour.isBefore(oldEndHour) && endHour.isAfter(oldStartHour)) {
+							return false;
+						}
+
+					} catch (DateTimeParseException e) {
+						return false;
+					}
+				}
 			}
 		}
 

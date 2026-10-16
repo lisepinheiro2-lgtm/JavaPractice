@@ -3,8 +3,11 @@ package training;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
-import java.awt.GridBagLayout;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -13,35 +16,43 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 public class Swing {
 
 	private JFrame frame;
+
 	private JPanel panel;
-	private JLabel practiceLabel;
-	private JLabel readyLabel;
-	private JButton startButton;
-	private JButton resetButton;
 	private JPanel panelButton;
-	private JComboBox<String> difficultysBox;
-	private JPanel selectMod;
-	private JComboBox<String> modsBox;
-	private JPanel searchPanel;
-	private JPanel panelNorth;
-	private JPanel difficultyPanel;
-	private JTextField pseudoField;
-	private JPanel homePanel;
 	private JPanel homePanelIntervention;
-	private JPanel homeButtonPanel;
-	private JButton accueilHomeButton;
-	private JButton interventionHomeButton;
 	private JPanel cardsPanel;
-	private CardLayout cardLayout;
+
+	private JLabel readyLabel;
+
+	private JButton startButton;
 	private JButton searchButton;
 
+	private JComboBox<String> difficultysBox;
+	private JComboBox<String> modsBox;
+
+	private JTextField pseudoField;
+	private JTextField nameField;
+	private JTextField startField;
+	private JTextField endField;
+
+	private CardLayout cardLayout;
+
 	String[] pseudos = { "Charlotte", "Anna", };
+
+	private final CSV csv;
+	private final InterventionService interventionService;
+
+	public Swing(ArrayList<Intervention> interventions, CSV csv) {
+		this.csv = csv;
+		this.interventionService = new InterventionService(interventions);
+	}
 
 	public void createPanel() {
 
@@ -49,14 +60,14 @@ public class Swing {
 		panel.setLayout(new GridLayout(4, 1));
 		panel.setForeground(Color.DARK_GRAY);
 
-		practiceLabel = new JLabel("Java Practice");
+		JLabel practiceLabel = new JLabel("Java Practice");
 		practiceLabel.setHorizontalAlignment(JLabel.CENTER);
 
 		readyLabel = new JLabel("Ready");
 		readyLabel.setHorizontalAlignment(JLabel.CENTER);
 
 		startButton = new JButton("Start");
-		resetButton = new JButton("Reset");
+		JButton resetButton = new JButton("Reset");
 
 		JLabel homeLabel = new JLabel("<html><center>Accueil<br>Bienvenue dans JavaPractice</center></html>");
 		homeLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -77,7 +88,7 @@ public class Swing {
 
 	public JPanel createPanelNorth() {
 
-		panelNorth = new JPanel();
+		JPanel panelNorth = new JPanel();
 		panelNorth.setLayout(new GridLayout(3, 0));
 		panelNorth.setForeground(Color.DARK_GRAY);
 
@@ -90,11 +101,11 @@ public class Swing {
 
 	public void search(String[] pseudos) {
 
+		String pseudoName = pseudoField.getText().trim();
+
 		for (String pseudo : pseudos) {
 
-			String pseudoName = pseudoField.getText();
-
-			if (pseudoName.trim().equalsIgnoreCase(pseudo)) {
+			if (pseudoName.equalsIgnoreCase(pseudo)) {
 				JOptionPane.showMessageDialog(frame, "Recherche de " + pseudo);
 				return;
 			}
@@ -155,23 +166,9 @@ public class Swing {
 		}
 	}
 
-	public void showDifficulty() {
-
-		if (difficultysBox.getSelectedItem() != null) {
-			String selected = (String) difficultysBox.getSelectedItem();
-
-			int result = JOptionPane.showConfirmDialog(frame, "Démarrer en mod  " + selected.toLowerCase() + " ?",
-					"Confirmation", JOptionPane.YES_NO_OPTION);
-
-			if (result == JOptionPane.YES_OPTION) {
-				readyLabel.setText("Started");
-			}
-		}
-	}
-
 	public JPanel createJComboBox() {
 
-		difficultyPanel = new JPanel();
+		JPanel difficultyPanel = new JPanel();
 		difficultyPanel.setLayout(new BorderLayout(0, 0));
 		difficultyPanel.setForeground(Color.DARK_GRAY);
 
@@ -191,7 +188,7 @@ public class Swing {
 
 	public JPanel createSearchPanel() {
 
-		searchPanel = new JPanel();
+		JPanel searchPanel = new JPanel();
 		searchPanel.setLayout(new BorderLayout(8, 0));
 		searchPanel.setForeground(Color.DARK_GRAY);
 
@@ -247,7 +244,7 @@ public class Swing {
 
 	public JPanel selectMod() {
 
-		selectMod = new JPanel();
+		JPanel selectMod = new JPanel();
 		selectMod.setLayout(new BorderLayout(29, 0));
 		selectMod.setForeground(Color.DARK_GRAY);
 
@@ -266,9 +263,12 @@ public class Swing {
 
 	public JPanel createHomePanel() {
 
-		homePanel = new JPanel();
+		JPanel homePanel = new JPanel();
 
 		homePanel.setLayout(new BorderLayout());
+
+		createButtonPanel();
+		createPanel();
 
 		homePanel.add(createPanelNorth(), BorderLayout.NORTH);
 		homePanel.add(panelButton, BorderLayout.CENTER);
@@ -289,23 +289,94 @@ public class Swing {
 	public JPanel createHomePanelIntervention() {
 
 		homePanelIntervention = new JPanel();
-		JLabel interventionLabel = new JLabel("<html><center>Interventions<br>Liste des interventions</center></html>");
+		homePanelIntervention.setLayout(new BorderLayout(0, 10));
 
-		homePanelIntervention.add(interventionLabel);
+		nameField = new JTextField(10);
+		startField = new JTextField(10);
+		endField = new JTextField(10);
+
+		JPanel formContainer = UiUtils.createForm(new String[] { "Nom", "Heure de début", "Heure de fin" },
+				new JTextField[] { nameField, startField, endField });
+		JLabel interventionLabel = new JLabel("<html><center>Interventions<br>Liste des interventions</center></html>");
+		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		JButton addIntervention = new JButton("Ajouter l'intervention");
+
+		buttonPanel.add(addIntervention);
+		interventionLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		addIntervention.addActionListener(e -> addIntervention());
+
+		homePanelIntervention.add(formContainer, BorderLayout.CENTER);
+		homePanelIntervention.add(interventionLabel, BorderLayout.NORTH);
+		homePanelIntervention.add(buttonPanel, BorderLayout.SOUTH);
 
 		return homePanelIntervention;
 	}
 
+	public void addIntervention() {
+
+		if (nameField.getText().isBlank()) {
+			JOptionPane.showMessageDialog(homePanelIntervention, "Veuillez entrer un nom");
+			return;
+		}
+
+		try {
+
+			if (startField.getText().isBlank()) {
+				JOptionPane.showMessageDialog(homePanelIntervention, "Veuillez entrer une heure de début");
+				return;
+			}
+
+			else if (endField.getText().isBlank()) {
+				JOptionPane.showMessageDialog(homePanelIntervention, "Veuillez entrer une heure de fin");
+				return;
+			}
+
+			LocalTime startParssed = FormatUtils.parseHour(startField.getText());
+			LocalTime endParssed = FormatUtils.parseHour(endField.getText());
+
+			String name = nameField.getText();
+			String start = startParssed.toString();
+			String end = endParssed.toString();
+
+			int result = interventionService.addIntervention(name, startParssed, endParssed, csv);
+
+			if (result == 1) {
+				JOptionPane.showMessageDialog(homePanelIntervention, "L'intervention existe déjà");
+				return;
+			}
+
+			if (result == 2) {
+				JOptionPane.showMessageDialog(homePanelIntervention, "Erreur lors de la sauvegarde");
+				return;
+			}
+
+			if (result == 3) {
+				JOptionPane.showMessageDialog(homePanelIntervention, "L'heure de début doit précéder l'heure de fin");
+				return;
+			}
+
+			nameField.setText("");
+			startField.setText("");
+			endField.setText("");
+
+			System.out.println(name + " - " + start + " - " + end);
+
+		} catch (DateTimeParseException e) {
+			JOptionPane.showMessageDialog(homePanelIntervention, "Veuillez entrer des heures valides");
+		}
+
+	}
+
 	public JPanel createHomeButtonPanel() {
 
-		homeButtonPanel = new JPanel();
-		accueilHomeButton = new JButton("Accueil");
-		interventionHomeButton = new JButton("Interventions");
+		JPanel homeButtonPanel = new JPanel();
+		JButton accueilHomeButton = new JButton("Accueil");
+		JButton interventionHomeButton = new JButton("Interventions");
 
 		homeButtonPanel.setLayout(new GridLayout(1, 2, 8, 0));
 
-		homeButtonPanel.add(accueilHomeButton, BorderLayout.WEST);
-		homeButtonPanel.add(interventionHomeButton, BorderLayout.EAST);
+		homeButtonPanel.add(accueilHomeButton);
+		homeButtonPanel.add(interventionHomeButton);
 
 		accueilHomeButton.addActionListener(e -> cardLayout.show(cardsPanel, "HOME"));
 		interventionHomeButton.addActionListener(e -> cardLayout.show(cardsPanel, "INTERVENTIONS"));
@@ -344,4 +415,5 @@ public class Swing {
 		frame.setForeground(Color.DARK_GRAY);
 		frame.setVisible(true);
 	}
+
 }

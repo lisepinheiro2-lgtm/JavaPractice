@@ -13,7 +13,6 @@ public class Intervention {
 		this.endHour = endHour;
 	}
 
-
 	public String getStartHour() {
 		return startHour;
 	}

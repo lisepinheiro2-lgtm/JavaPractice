@@ -1,5 +1,7 @@
 package training;
 
+import java.util.ArrayList;
+
 public class Basics {
 
 	public static int limitScore(int score) {
@@ -80,5 +82,37 @@ public class Basics {
 		}
 
 		return index;
+	}
+
+	public static int calculateBalance(int initialBalance, int[] operations) {
+
+		ArrayList<Integer> operationsList = new ArrayList<Integer>();
+
+		for (int i = 0; i < operations.length; i++) {
+
+			operationsList.add(operations[i]);
+		}
+
+		int numberToDelete = 0;
+
+		for (int i = operationsList.size() - 1; i >= 0; i--) {
+
+			if (operationsList.get(i) == 0) {
+
+				numberToDelete++;
+				operationsList.remove(i);
+
+			} else if (numberToDelete > 0) {
+				operationsList.remove(i);
+				numberToDelete--;
+			}
+		}
+
+		for (int operation : operationsList) {
+
+			initialBalance += operation;
+		}
+
+		return initialBalance;
 	}
 }
