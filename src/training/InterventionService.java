@@ -61,4 +61,40 @@ public class InterventionService {
 
 		return Dates.calculateTotalWorkMinutes(interventionsAtName);
 	}
+
+	public ArrayList<Intervention> getVisibleInterventions(String requesterName, String role) {
+
+		ArrayList<Intervention> visibleInterventions = new ArrayList<Intervention>();
+
+		for (Intervention intervention : interventions) {
+
+			boolean result = AccessPolicy.canViewIntervention(requesterName, role, intervention);
+
+			if (result) {
+				visibleInterventions.add(intervention);
+			}
+		}
+
+		return visibleInterventions;
+	}
+
+	public boolean updateInterventionHours(String requesterName, String role, Intervention intervention,
+			LocalTime newStart, LocalTime newEnd) {
+
+		if (requesterName == null || requesterName.isBlank() || intervention == null || role == null || newStart == null
+				|| newEnd == null || !isValidSchedule(newStart, newEnd)) {
+			return false;
+		}
+
+		if (interventions.contains(intervention)
+				&& AccessPolicy.canEditIntervention(requesterName, role, intervention)) {
+
+			intervention.setStartHour(newStart.toString());
+			intervention.setEndHour(newEnd.toString());
+
+			return true;
+		}
+
+		return false;
+	}
 }

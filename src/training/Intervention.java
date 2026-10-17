@@ -36,5 +36,4 @@ public class Intervention {
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
 	}
-
 }

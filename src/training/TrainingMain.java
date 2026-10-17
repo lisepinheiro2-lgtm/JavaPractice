@@ -1,6 +1,7 @@
 package training;
 
 import java.io.IOException;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,7 +103,7 @@ public class TrainingMain {
 		interventions.add(new Intervention("Anna", "09:00", "10:00"));
 		interventions.add(new Intervention("Lucas", "10:30", "12:00"));
 		interventions.add(new Intervention("ANNA", "14:00", "16:00"));
-		interventions.add(new Intervention("Anna", "17:15", "18:00"));
+		interventions.add(new Intervention("Emma", "17:15", "18:00"));
 
 		InterventionService test = new InterventionService(interventions);
 
@@ -131,5 +132,33 @@ public class TrainingMain {
 		interventionsToCheck.add("Emma;14:00");
 
 		System.out.println(CSVTraining.findInvalidRecords(interventionsToCheck));
+
+		InterventionService accessService = new InterventionService(interventions);
+		System.out.println(accessService.getVisibleInterventions("Anna", "EMPLOYEE").size() + " - "
+				+ accessService.getVisibleInterventions("Lucas", "EMPLOYEE").size() + " - "
+				+ accessService.getVisibleInterventions("Emma", "ADMIN").size() + " - "
+				+ accessService.getVisibleInterventions("Hugo", "VISITOR").size() + " - "
+				+ accessService.getVisibleInterventions(null, "ADMIN").size());
+
+		ArrayList<Intervention> interventions2 = new ArrayList<Intervention>();
+		interventions2.add(new Intervention("Anna", "09:00", "10:00"));
+
+		InterventionService accessService2 = new InterventionService(interventions2);
+
+		for (Intervention intervention : interventions2) {
+
+			LocalTime start = LocalTime.parse("11:00");
+			LocalTime end = LocalTime.parse("12:00");
+
+			boolean result1 = accessService2.updateInterventionHours("Anna", "employee", intervention, start, end);
+			System.out.println(result1 + " → " + intervention.getStartHour() + " - " + intervention.getEndHour());
+
+			boolean result2 = accessService2.updateInterventionHours("Emma", "admin", intervention, start, end);
+			System.out.println(result2 + " → " + intervention.getStartHour() + " - " + intervention.getEndHour());
+
+			boolean result3 = accessService2.updateInterventionHours("Emma", "admin", intervention,
+					LocalTime.parse("15:00"), LocalTime.parse("14:00"));
+			System.out.println(result3 + " → " + intervention.getStartHour() + " - " + intervention.getEndHour());
+		}
 	}
 }
