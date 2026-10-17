@@ -56,7 +56,8 @@ public class CSVTraining {
 		}
 	}
 
-	public static int updateEndHours(ArrayList<String> records, String targetName, String newEndHour) throws IOException {
+	public static int updateEndHours(ArrayList<String> records, String targetName, String newEndHour)
+			throws IOException {
 
 		int count = 0;
 
@@ -128,5 +129,29 @@ public class CSVTraining {
 		}
 
 		return count;
+	}
+
+	public static ArrayList<String> findInvalidRecords(ArrayList<String> records) {
+
+		ArrayList<String> invalidsInterventions = new ArrayList<String>();
+
+		for (String record : records) {
+
+			String[] data = record.split(";", -1);
+
+			if (data.length != 3) {
+				invalidsInterventions.add(record);
+
+			} else {
+
+				boolean valid = InterventionValidator.isValidName(data[0]);
+
+				if (!valid) {
+					invalidsInterventions.add(record);
+				}
+			}
+		}
+
+		return invalidsInterventions;
 	}
 }

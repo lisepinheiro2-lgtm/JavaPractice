@@ -9,6 +9,7 @@ public class TrainingMain {
 	public static void main(String[] args) {
 
 		try {
+
 			ArrayList<String> records = new ArrayList<>();
 
 			records.add("Anna;09:00;09:45");
@@ -96,5 +97,39 @@ public class TrainingMain {
 		newRecords.add("Alice;2026-10-16;15:00;16:00");
 
 		System.out.println(CSVTraining.importInterventions(existingRecords, newRecords));
+
+		ArrayList<Intervention> interventions = new ArrayList<Intervention>();
+		interventions.add(new Intervention("Anna", "09:00", "10:00"));
+		interventions.add(new Intervention("Lucas", "10:30", "12:00"));
+		interventions.add(new Intervention("ANNA", "14:00", "16:00"));
+		interventions.add(new Intervention("Anna", "17:15", "18:00"));
+
+		InterventionService test = new InterventionService(interventions);
+
+		System.out.println("Minutes Travaillées : " + System.lineSeparator() + "Anna : "
+				+ test.calculateWorkMinutesFor("anna") + " - " + "Lucas : " + test.calculateWorkMinutesFor("Lucas")
+				+ " - " + "Emma : " + test.calculateWorkMinutesFor("Emma"));
+
+		ArrayList<String> workReport = new ArrayList<String>();
+		workReport.add("Name;Minutes");
+		workReport.add("Anna;" + test.calculateWorkMinutesFor("anna"));
+		workReport.add("Lucas;" + test.calculateWorkMinutesFor("lucas"));
+		workReport.add("Emma;" + test.calculateWorkMinutesFor("emma"));
+
+//		try {
+//		    CSVTraining.saveReport("work-report-training.csv", workReport);
+//
+//		} catch (IOException e) {
+//		    System.err.println("Erreur de sauvegarde : " + e.getMessage());
+//		}
+
+		ArrayList<String> interventionsToCheck = new ArrayList<String>();
+		interventionsToCheck.add("Anna;09:00;10:00");
+		interventionsToCheck.add("Lucas;10:00;11:00");
+		interventionsToCheck.add("Anna;Admin;09:00;10:00");
+		interventionsToCheck.add(";08:00;09:00");
+		interventionsToCheck.add("Emma;14:00");
+
+		System.out.println(CSVTraining.findInvalidRecords(interventionsToCheck));
 	}
 }

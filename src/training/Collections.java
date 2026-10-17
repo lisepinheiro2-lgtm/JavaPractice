@@ -653,4 +653,19 @@ public class Collections {
 
 		return true;
 	}
+
+	public static ArrayList<Intervention> findInterventionsByName(ArrayList<Intervention> interventions, String name) {
+
+		ArrayList<Intervention> foundInterventions = new ArrayList<Intervention>();
+		
+		
+		for (Intervention intervention : interventions) {
+			
+			if (intervention.getFirstName().equalsIgnoreCase(name)) {
+				foundInterventions.add(intervention);
+			}
+		}
+		
+		return foundInterventions;
+	}
 }

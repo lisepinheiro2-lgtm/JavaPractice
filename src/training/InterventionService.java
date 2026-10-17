@@ -30,6 +30,10 @@ public class InterventionService {
 			return 3;
 		}
 
+		if (!InterventionValidator.isValidName(name)) {
+			return 4;
+		}
+
 		String startText = start.toString();
 		String endText = end.toString();
 
@@ -49,5 +53,12 @@ public class InterventionService {
 
 	public boolean isValidSchedule(LocalTime start, LocalTime end) {
 		return end.isAfter(start);
+	}
+
+	public long calculateWorkMinutesFor(String name) {
+
+		ArrayList<Intervention> interventionsAtName = Collections.findInterventionsByName(interventions, name);
+
+		return Dates.calculateTotalWorkMinutes(interventionsAtName);
 	}
 }

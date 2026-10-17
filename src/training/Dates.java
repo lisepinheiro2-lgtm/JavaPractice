@@ -1,5 +1,7 @@
 package training;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -452,4 +454,21 @@ public class Dates {
 		return (int) maxWorkTime;
 	}
 
+	public static long calculateTotalWorkMinutes(ArrayList<Intervention> interventions) {
+
+		long result = 0;
+
+		for (Intervention intervention : interventions) {
+
+			String startText = intervention.getStartHour();
+			String endText = intervention.getEndHour();
+
+			LocalTime start = LocalTime.parse(startText);
+			LocalTime end = LocalTime.parse(endText);
+
+			result += Duration.between(start, end).toMinutes();
+		}
+
+		return result;
+	}
 }

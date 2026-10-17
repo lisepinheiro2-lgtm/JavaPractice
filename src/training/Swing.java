@@ -355,6 +355,11 @@ public class Swing {
 				return;
 			}
 
+			if (result == 4) {
+				JOptionPane.showMessageDialog(homePanelIntervention, "Nom invalide");
+				return;
+			}
+
 			nameField.setText("");
 			startField.setText("");
 			endField.setText("");
@@ -413,6 +418,9 @@ public class Swing {
 		frame.setSize(300, 320);
 		frame.setLocationRelativeTo(null);
 		frame.setForeground(Color.DARK_GRAY);
+		frame.setVisible(true);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 	}
 
