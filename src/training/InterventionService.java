@@ -24,6 +24,25 @@ public class InterventionService {
 		return false;
 	}
 
+	private boolean hasScheduleConflict(String name, LocalTime start, LocalTime end, Intervention excluded) {
+
+		for (Intervention existing : interventions) {
+
+			if (existing == excluded || !name.equalsIgnoreCase(existing.getFirstName())) {
+				continue;
+			}
+
+			LocalTime existingStart = FormatUtils.parseHour(existing.getStartHour());
+			LocalTime existingEnd = FormatUtils.parseHour(existing.getEndHour());
+
+			if (InterventionValidator.hasTimeOverlap(existingStart, existingEnd, start, end)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public int addIntervention(String name, LocalTime start, LocalTime end, CSV csv) {
 
 		if (!isValidSchedule(start, end)) {
@@ -41,6 +60,10 @@ public class InterventionService {
 			return 1;
 		}
 
+		if (hasScheduleConflict(name, start, end, null)) {
+			return 5;
+		}
+
 		Intervention intervention = new Intervention(name, startText, endText);
 
 		if (!csv.saveIntervention(intervention)) {
@@ -52,7 +75,7 @@ public class InterventionService {
 	}
 
 	public boolean isValidSchedule(LocalTime start, LocalTime end) {
-		return end.isAfter(start);
+		return start != null && end != null && end.isAfter(start);
 	}
 
 	public long calculateWorkMinutesFor(String name) {
@@ -81,20 +104,23 @@ public class InterventionService {
 	public boolean updateInterventionHours(String requesterName, String role, Intervention intervention,
 			LocalTime newStart, LocalTime newEnd) {
 
-		if (requesterName == null || requesterName.isBlank() || intervention == null || role == null || newStart == null
-				|| newEnd == null || !isValidSchedule(newStart, newEnd)) {
+		if (requesterName == null || requesterName.isBlank() || intervention == null || role == null
+				|| !isValidSchedule(newStart, newEnd)) {
 			return false;
 		}
 
-		if (interventions.contains(intervention)
-				&& AccessPolicy.canEditIntervention(requesterName, role, intervention)) {
-
-			intervention.setStartHour(newStart.toString());
-			intervention.setEndHour(newEnd.toString());
-
-			return true;
+		if (!interventions.contains(intervention)
+				|| !AccessPolicy.canEditIntervention(requesterName, role, intervention)) {
+			return false;
 		}
 
-		return false;
+		if (hasScheduleConflict(intervention.getFirstName(), newStart, newEnd, intervention)) {
+			return false;
+		}
+
+		intervention.setStartHour(newStart.toString());
+		intervention.setEndHour(newEnd.toString());
+
+		return true;
 	}
 }

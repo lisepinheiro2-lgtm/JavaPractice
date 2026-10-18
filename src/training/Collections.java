@@ -1,10 +1,6 @@
 package training;
 
-import java.io.IOException;
-import java.lang.classfile.instruction.NewMultiArrayInstruction;
-import java.text.ParseException;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -558,12 +554,8 @@ public class Collections {
 	public static boolean canScheduleIntervention(ArrayList<LocalTime[]> interventions, LocalTime newStart,
 			LocalTime newEnd) {
 
-		if (newEnd.isBefore(newStart) || newEnd.equals(newStart)) {
+		if (newStart == null || newEnd == null || !newEnd.isAfter(newStart)) {
 			return false;
-		}
-
-		if (interventions.isEmpty()) {
-			return true;
 		}
 
 		for (LocalTime[] intervention : interventions) {
@@ -571,10 +563,7 @@ public class Collections {
 			LocalTime startHour = intervention[0];
 			LocalTime endHour = intervention[1];
 
-			boolean result = startHour.isAfter(newEnd) || startHour.equals(newEnd) || endHour.isBefore(newStart)
-					|| endHour.equals(newStart);
-
-			if (!result) {
+			if (InterventionValidator.hasTimeOverlap(startHour, endHour, newStart, newEnd)) {
 				return false;
 			}
 		}
@@ -640,7 +629,7 @@ public class Collections {
 						LocalTime oldEndHour = LocalTime.parse(oldEndHourText);
 						LocalTime oldStartHour = LocalTime.parse(oldStartHourText);
 
-						if (startHour.isBefore(oldEndHour) && endHour.isAfter(oldStartHour)) {
+						if (InterventionValidator.hasTimeOverlap(startHour, endHour, oldStartHour, oldEndHour)) {
 							return false;
 						}
 
@@ -657,15 +646,14 @@ public class Collections {
 	public static ArrayList<Intervention> findInterventionsByName(ArrayList<Intervention> interventions, String name) {
 
 		ArrayList<Intervention> foundInterventions = new ArrayList<Intervention>();
-		
-		
+
 		for (Intervention intervention : interventions) {
-			
+
 			if (intervention.getFirstName().equalsIgnoreCase(name)) {
 				foundInterventions.add(intervention);
 			}
 		}
-		
+
 		return foundInterventions;
 	}
 }

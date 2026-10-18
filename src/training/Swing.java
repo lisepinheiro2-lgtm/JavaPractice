@@ -359,6 +359,11 @@ public class Swing {
 				JOptionPane.showMessageDialog(homePanelIntervention, "Nom invalide");
 				return;
 			}
+			
+			if (result == 5) {
+				JOptionPane.showMessageDialog(homePanelIntervention, "Conflit avec une intervention existante");
+				return;
+			}
 
 			nameField.setText("");
 			startField.setText("");

@@ -9,6 +9,8 @@ import java.util.ArrayList;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 class InterventionServiceTest {
 
@@ -64,5 +66,53 @@ class InterventionServiceTest {
 		assertFalse(result);
 		assertEquals("09:00", currentIntervention.getStartHour());
 		assertEquals("10:00", currentIntervention.getEndHour());
+	}
+
+	@Test
+	void testAuthorizedUpdate() {
+
+		Intervention currentIntervention = interventions.getFirst();
+
+		boolean result = test.updateInterventionHours("Emma", "admin", currentIntervention, LocalTime.parse("11:00"),
+				LocalTime.parse("12:00"));
+
+		assertTrue(result);
+		assertEquals("11:00", currentIntervention.getStartHour());
+		assertEquals("12:00", currentIntervention.getEndHour());
+	}
+
+	@Test
+	void testInvalidScheduleUpdate() {
+
+		Intervention currentIntervention = interventions.getFirst();
+
+		boolean result = test.updateInterventionHours("Emma", "admin", currentIntervention, LocalTime.parse("15:00"),
+				LocalTime.parse("14:00"));
+
+		assertFalse(result);
+		assertEquals("09:00", currentIntervention.getStartHour());
+		assertEquals("10:00", currentIntervention.getEndHour());
+	}
+
+	@Test
+	void testOverlappingUpdate() {
+
+		Intervention currentIntervention = interventions.getFirst();
+
+		boolean result = test.updateInterventionHours("Emma", "admin", currentIntervention, LocalTime.parse("14:30"),
+				LocalTime.parse("15:30"));
+
+		assertFalse(result);
+		assertEquals("09:00", currentIntervention.getStartHour());
+		assertEquals("10:00", currentIntervention.getEndHour());
+	}
+
+	@Test
+	void testAddInterventionConflict() {
+
+		int result = test.addIntervention("Anna", LocalTime.parse("14:30"), LocalTime.parse("15:30"), null);
+
+		assertEquals(5, result);
+		assertEquals(4, interventions.size());
 	}
 }
